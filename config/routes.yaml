@@ -1,0 +1,25 @@
+#index:
+#    path: /
+#    controller: App\Controller\DefaultController::index
+register:
+  path: /register
+  controller: App\Controller\AuthController::register
+  methods: POST
+
+api_login_check:
+  path: /api/login_check
+  controller: App\Controller\AuthController::getTokenUser
+
+api_logiout:
+  path: /api/logout
+  controller: App\Controller\AuthController::logout
+
+api_edit_user:
+  path: /api/user/edit
+  controller: App\Controller\UserController::edit
+  methods: POST
+
+api_change_user_pasword:
+  path: /api/user/change_password
+  controller: App\Controller\UserController::changePassword
+  methods: POST
