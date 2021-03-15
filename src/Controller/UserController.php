@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Event\AccountPasswordChanged;
 use App\Service\UserService;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +19,7 @@ class UserController extends ApiController
         $this->userService = $userService;
     }
 
-    public function edit(Request $request, UserInterface $user): JsonResponse
+    public function edit(Request $request, UserInterface $user, JWTTokenManagerInterface $JWTManager): JsonResponse
     {
         $request = $this->transformJsonBody($request);
         $username = $request->get('username');
@@ -28,9 +29,9 @@ class UserController extends ApiController
             return $this->respondValidationError("Invalid Username or Email");
         }
 
-        $user = $this->userService->editUser($user, $username, $email);
+        $user = $this->userService->editUser($user, $email,  $username);
 
-        return $this->respondWithSuccess(sprintf('User %s successfully created', $user->getUsername()));
+        return new JsonResponse(['token' => $JWTManager->create($user)]);
     }
 
     public function changePassword(Request $request, UserInterface $user, EventDispatcherInterface $eventDispatcher): JsonResponse
@@ -46,6 +47,6 @@ class UserController extends ApiController
 
         $eventDispatcher->dispatch(new AccountPasswordChanged($user));
 
-        return $this->respondWithSuccess(sprintf('User %s successfully created', $user->getUsername()));
+        return $this->respondWithSuccess(sprintf('User %s password successfully changed', $user->getUsername()));
     }
 }
